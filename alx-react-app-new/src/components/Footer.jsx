@@ -6,8 +6,9 @@ function Footer() {
         color: "white",
         textAlign: "center",
         padding: "10px",
+        fontSize: "14px",
       }}>
-      <p>© 2025 My Favorite Cities</p>
+      <p>© 2023 City Lovers</p>
     </footer>
   );
 }
