@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://api.github.com/search/users";
+const BASE_URL = "https://api.github.com/search/users?q=";
 
 export const searchUsers = async ({ username, location, minRepos }) => {
   let query = "";
@@ -14,7 +14,7 @@ export const searchUsers = async ({ username, location, minRepos }) => {
 
   try {
     const response = await axios.get(
-      `${BASE_URL}?q=${encodeURIComponent(query)}`,
+      `${BASE_URL}${encodeURIComponent(query)}`,
       {
         headers,
       }
