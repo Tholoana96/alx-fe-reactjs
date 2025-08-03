@@ -25,3 +25,21 @@ export const searchUsers = async ({ username, location, minRepos }) => {
     return [];
   }
 };
+
+export const fetchUserData = async (username) => {
+  const token = import.meta.env.VITE_APP_GITHUB_API_KEY;
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+  try {
+    const response = await axios.get(
+      `https://api.github.com/users/${username}`,
+      {
+        headers,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    return null;
+  }
+};
