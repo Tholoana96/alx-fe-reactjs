@@ -3,6 +3,8 @@ import RecipeList from "src/components/RecipeList";
 import AddRecipeForm from "src/components/AddRecipeForm";
 import RecipeDetails from "src/components/RecipeDetails";
 import SearchBar from "./components/SearchBar";
+import FavoritesList from "./components/FavoritesList";
+import RecommendationsList from "./components/RecommendationsList";
 
 function App() {
   return (
