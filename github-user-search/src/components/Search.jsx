@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { searchUsers } from "../services/githubService";
+import { searchUsers, fetchUserData } from "../services/githubService";
 
 const Search = () => {
   const [username, setUsername] = useState("");
@@ -9,10 +9,16 @@ const Search = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(false);
+  const [userError, setUserError] = useState("");
+
+  // Search handler
   const handleSearch = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSelectedUser(null); // clear previous details
 
     try {
       const users = await searchUsers({ username, location, minRepos });
@@ -25,6 +31,23 @@ const Search = () => {
       setError("Something went wrong.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch detailed info for a selected user
+  const handleUserClick = async (username) => {
+    setLoadingUser(true);
+    setUserError("");
+    setSelectedUser(null);
+
+    try {
+      const userDetails = await fetchUserData(username);
+      setSelectedUser(userDetails);
+    } catch (err) {
+      console.error(err);
+      setUserError("Failed to fetch user details.");
+    } finally {
+      setLoadingUser(false);
     }
   };
 
@@ -69,14 +92,14 @@ const Search = () => {
       </form>
 
       {loading && <p className="mt-4 text-center">Loading...</p>}
-
       {error && <p className="mt-4 text-center text-red-500">{error}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
         {results.map((user) => (
           <div
             key={user.id}
-            className="border rounded-lg p-4 shadow flex items-center gap-4">
+            className="border rounded-lg p-4 shadow flex items-center gap-4 cursor-pointer"
+            onClick={() => handleUserClick(user.login)}>
             <img
               src={user.avatar_url}
               alt={user.login}
@@ -88,13 +111,48 @@ const Search = () => {
                 href={user.html_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-500 hover:underline">
+                className="text-blue-500 hover:underline"
+                onClick={(e) => e.stopPropagation()} // prevent card click
+              >
                 View Profile
               </a>
             </div>
           </div>
         ))}
       </div>
+
+      {loadingUser && (
+        <p className="mt-6 text-center">Loading user details...</p>
+      )}
+      {userError && (
+        <p className="mt-6 text-center text-red-500">{userError}</p>
+      )}
+
+      {selectedUser && (
+        <div className="mt-6 p-4 border rounded shadow bg-white">
+          <h2 className="text-2xl font-bold mb-2">
+            {selectedUser.name || selectedUser.login}
+          </h2>
+          <img
+            src={selectedUser.avatar_url}
+            alt={selectedUser.login}
+            className="w-32 h-32 rounded-full mb-4"
+          />
+          <p>{selectedUser.bio || "No bio available"}</p>
+          <p>
+            Followers: {selectedUser.followers} - Following:{" "}
+            {selectedUser.following}
+          </p>
+          <p>Location: {selectedUser.location || "Unknown"}</p>
+          <a
+            href={selectedUser.html_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline">
+            Visit GitHub Profile
+          </a>
+        </div>
+      )}
     </div>
   );
 };
